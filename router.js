@@ -103,6 +103,52 @@ router.post('/login', loginValidation, (req, res, next) => {
     )
 });
 
+router.post('/get-user', signupValidation, (req, res, next) => {
+
+
+  if(
+      !req.headers.authorization ||
+      !req.headers.authorization.startsWith('Bearer') ||
+      !req.headers.authorization.split(' ')[1]
+  ){
+      return res.status(422).json({
+          message: "Please provide the token",
+      });
+  }
+
+  const theToken = req.headers.authorization.split(' ')[1];
+  const decoded = jwt.verify(theToken, 'the-super-strong-secrect');
+
+  db.query('SELECT * FROM user where username=?', decoded.username, function (error, results, fields) {
+      if (error) throw error;
+      return res.send({ error: false, data: results[0], message: 'Fetch Successfully.' });
+  });
+
+
+});
+
+// router.post('/get-user', (req, res) => {
+//       let jwtSecretKey = process.env.JWT_SECRET_KEY;
+  
+//       try {
+//           const token = req.header('Authorization');
+  
+//           const verified = jwt.verify(token, jwtSecretKey);
+//           if(verified){
+//               console.log(verified.username);
+//               console.log(verified.role);
+//               return res.send("Successfully Verified");
+//           }else{
+//               // Access Denied
+//               return res.status(401).send(error);
+//           }
+//       } catch (error) {
+//           // Access Denied
+//           return res.status(401).send(error);
+//       }
+//   })
+  
+
   
 
  
